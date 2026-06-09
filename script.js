@@ -1,10 +1,8 @@
 /* TODO
-    * Double click fullscreen
+    * Menu bar
     * Keyboard shortcuts
         * Search bar
     * Fake files
-    * Save window sizes
-    * Save open windows
     * Light dark mode
 */
 /* Apps:
@@ -67,10 +65,11 @@ function updateInformation() {
 }
 
 function closeWindow(windowEl) {
-    windowEl.style.display = "none"
+    windowEl.style.display = "none";
 }
 function openWindow(windowEl) {
-    windowEl.style.display = "flex"
+    windowEl.style.display = "flex";
+    bringToFront(windowEl);
 }
 
 function saveWindowData() {
@@ -99,15 +98,58 @@ function loadWindowData() {
         windows.forEach((windowEl) => {
             let name = windowEl.getAttribute("name");
             let data = windowData[name];
-            
-            windowEl.style.left = data["left"];
-            windowEl.style.top = data["top"];
-            windowEl.style.width = data["width"];
-            windowEl.style.height = data["height"];
-            windowEl.style.zIndex = data["zIndex"];
-            windowEl.style.display = data["isOpen"] ? "flex" : "none";
+
+            if (data) {
+
+                let desktopEl = document.getElementById("desktop");
+                let desktopNavEl = document.getElementById("desktop-nav");
+                let windowNavEl = windowEl.querySelector(".window-nav");
+
+                const minX = - (windowNavEl.clientWidth / 2);
+                const maxX = (desktopEl.clientWidth - windowNavEl.clientWidth) + (windowNavEl.clientWidth / 2);
+                const minY = desktopNavEl.clientHeight;
+                const maxY = desktopNavEl.clientHeight + desktopEl.clientHeight - windowNavEl.clientHeight;
+                
+                windowEl.style.left = data["left"];
+                windowEl.style.top = data["top"];
+                windowEl.style.width = data["width"];
+                windowEl.style.height = data["height"];
+                windowEl.style.zIndex = data["zIndex"];
+                windowEl.style.display = data["isOpen"] ? "flex" : "none";
+
+                windowEl.style.left = clamp(parseInt(windowEl.style.left), minX, maxX) + "px";
+                windowEl.style.top = clamp(parseInt(windowEl.style.top), minY, maxY) + "px";
+            }
         });
     }
+}
+
+function resetWindowData() {
+    window.localStorage.removeItem("windowData");
+}
+
+function navigate(url) {
+    const page = document.getElementById("browser-page");
+    
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
+    }
+
+    page.src = url;
+}
+
+function handleBrowser() {
+    const form = document.getElementById("search-form");
+    const urlBar = document.getElementById("url-bar");
+    const goBtn = document.getElementById("search");
+
+    form.addEventListener("submit", function(event) {
+        event.preventDefault(); 
+
+        let url = urlBar.value.trim();
+        navigate(url);
+    });
+
 }
 
 let activeWindow = null;
@@ -136,12 +178,15 @@ function dragElement(element) {
     const minY = desktopNavEl.clientHeight;
     const maxY = desktopNavEl.clientHeight + desktopEl.clientHeight - windowNavEl.clientHeight;
 
-    // let startPos = window.localStorage.getItem(windowName);
-    // if (startPos) {
-    //     startPos = startPos.split(",")
-    //     windowEl.style.left = clamp(parseInt(startPos[0]), minX + snapBackDist, maxX - snapBackDist) + "px";
-    //     windowEl.style.top = clamp(parseInt(startPos[1]), minY, maxY - snapBackDist) + "px";
-    // }
+    // Make double click fullscreen the window
+    windowNavEl.addEventListener("dblclick", (e) => {
+        windowEl.style.width = "100%";
+        windowEl.style.height = "100%";
+        let positionX = ((desktopEl.style.width) / 2) - ((windowEl.style.width) / 2)
+        let positionY = ((desktopEl.style.height) / 2) - ((windowEl.style.height) / 2)
+        windowEl.style.left = clamp(positionX, minX, maxX) + "px";
+        windowEl.style.top = clamp(positionY, minY, maxY) + "px";
+    })
 
     // Step 3: Check if there is a special header element associated with the draggable element.
     if (windowNavEl) {
@@ -237,6 +282,47 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".window-nav .btn-close").forEach((el) => {
         el.addEventListener("click", () => closeWindow(el.parentElement.parentElement));
     })
+
+    // Make inlinks open windows
+    document.querySelectorAll(".inlink").forEach((link) => {
+        link.addEventListener("click", (e) => {
+            e.preventDefault();
+            openWindow(document.querySelector(`[name='${link.getAttribute("data-window")}']`))
+
+        })
+    });
+
+    // Make menu bar open context menu
+    document.querySelectorAll("#desktop-nav ul li").forEach((item) => {
+        let menuEl = item.querySelector(".menu");
+        item.addEventListener("click", (e) => {
+            e.stopPropagation();
+
+            menuEl.style.display = "flex";
+            menuEl.style.opacity = 1;
+            const closeMenu = () => {
+                // Smooth transition
+                document.removeEventListener("click", closeMenu)
+                menuEl.style.opacity = 0;
+                setTimeout(() => {menuEl.style.display = "none"; menuEl.style.opacity = 1;}, 200);
+            };
+
+            document.addEventListener("click", closeMenu);
+        });
+    });
+
+    // Make menu buttons open windows
+    document.querySelectorAll(".menu ul li").forEach((menuItem) => {
+        menuItem.addEventListener("click", (e) => {
+            if (menuItem.getAttribute("data-window")) {
+                e.preventDefault();
+                openWindow(document.querySelector(`[name='${menuItem.getAttribute("data-window")}']`))
+            }
+
+        })
+    });
+
+    handleBrowser();
 
     // Save windows every 10 seconds
     setInterval(saveWindowData, 10_000);

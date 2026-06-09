@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pi WebOS</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="assets/favicon.png" type="image/x-icon">
 </head>
 <body>
     <nav id="desktop-nav">
@@ -11,8 +12,26 @@
             <li>π</li>
             <li>File</li>
             <li>Edit</li>
-            <li>Pages</li>
-            <li>Window</li>
+            <li>Pages
+                <div class="menu paper" style="display: none;">
+                    <ul>
+                        <li data-window="welcome">Welcome</li>
+                        <li data-window="browser">Browser</li>
+                        <li data-window="about">About This Project</li>
+                        <li data-window="credits">Credits</li>
+                    </ul>
+                </div>
+            </li>
+            <li>Window
+                <div class="menu paper" style="display: none;">
+                    <ul>
+                        <li data-window="welcome">Welcome</li>
+                        <li data-window="browser">Browser</li>
+                        <li data-window="about">About This Project</li>
+                        <li data-window="credits">Credits</li>
+                    </ul>
+                </div>
+            </li>
         </ul>
         <ul id="information">
             <li id="time">12:00:00</li>
@@ -28,27 +47,82 @@
             </nav>
             <div class="window-content paper">
                 <h1>Welcome!</h1>
-                <p>This is my WebOS app, made with pure HTML, CSS, and JS. You can learn more about this project in the <span class="text-code-block">About This Project</span> window.</p>
-                <p>To navigate to other windows, find the <span class="text-code-block">Window</span> option in the top menu and choose which to open.</p>
+                <p>Hi, I'm <strong>Pi</strong>, and this is my WebOS app, made with pure HTML, CSS, and JS. You can learn more about this project in the <span class="text-code-block"><a href="#" data-window="about" class="inlink">About This Project</a></span> window.</p>
+                <p>To navigate to other windows, find the <span class="text-code-block">Pages</span> option in the top menu and choose which to open. Alternatively, some links like <a href="#" data-window="about" class="inlink">this one</a> will also open a window. </p>
+                <br>
+                <p>You can resize these windows by dragging the bottom left corner. Try it!</p>
+                <br>
+                <p>Close the window with the <span class="text-code-block">x</span> in the top right corner of the window menu bar.</p>
             </div>
         </section>
-        <section class="window" name="browser">
+        <section class="window" name="browser" style="display: none;">
             <nav class="window-nav">
-                <h1 class="title">Website</h1>
+                <h1 class="title">Browser</h1>
                 <button class="btn-close">x</button>
             </nav>
-            <div class="window-content">
-                <!-- <iframe src="https://hackclub.com" title="duckduckgo.com" frameborder="0"></iframe> -->
+            <div class="window-content paper">
+                <form id="search-form">
+                    <input type="text" id="url-bar" placeholder="https://www.example.com/">
+                    <button id="search" type="submit">Go</button>
+                </form>
+                <iframe src="https://www.example.com" title="website" frameborder="0" id="browser-page"></iframe>
             </div>
         </section>
-        <section class="window" name="credits">
+        <section class="window" name="about" style="display: none;">
+            <nav class="window-nav">
+                <h1 class="title">About This Project</h1>
+                <button class="btn-close">x</button>
+            </nav>
+            <div class="window-content paper">
+                <h1>About This Project</h1>
+                <p>This project is a WebOS, albeit not a very good one. This was made for a mission as part of the <a href="https://stardance.hackclub.com/home">Stardance</a> program. The mission follows <a href="" onclick="event.preventDefault(); navigate('https://jams.hackclub.com/batch/webOS'); openWindow(document.getElementsByName('browser')[0])">a guide</a> to creating your own WebOS, but this has been heavily customized and has many features in addition to the base tutorial.</p>
+                <br>
+                <h2>Features</h2>
+                <ul>
+                    <li>Moveable, resizable, closable windows</li>
+                    <li>Window positions save on reload</li>
+                    <li>Correct Z ordering through</li>
+                    <li>Double click menu bar to fullscreen window</li>
+                    <li>Window cannot leave desktop</li>
+                    <li>Window snaps back into frame</li>
+                    <li>Multiple Apps
+                        <ul>
+                            <li>Text Documents (like this one!)</li>
+                            <li>(Mostly) Functional Browser</li>
+                            <li>Notes</li>
+                        </ul>
+                    </li>
+                    <li>Menu bar</li>
+                    <li>Browser/OS detection</li>
+                    <li>Links that open windows in the OS</li>
+                </ul>
+                <br>
+                <h2>Planned Features</h2>
+                <ul>
+                    <li>Keyboard Shortcuts</li>
+                    <li>Draggable files on desktop</li>
+                    <li>Light/dark mode/themes</li>
+                    <li>Double click menu bar to fullscreen window</li>
+                    <li>Customizable wallpaper</li>
+                    <li>Calculator App</li>
+                    <li>Stopwatch App</li>
+                </ul>
+            </div>
+        </section>
+        <section class="window" name="credits" style="display: none;">
             <nav class="window-nav">
                 <h1 class="title">Credits</h1>
                 <button class="btn-close">x</button>
             </nav>
             <div class="window-content paper">
                 <h1>Credits</h1>
-                <p">xkcd Font: https://github.com/ipython/xkcd-font</p>
+                <p>This is a project for the Hackclub Stardance event.</p>
+                <br>
+                <ul>
+                    <li><a href="https://jams.hackclub.com/batch/webOS/part-4">Mission</a></li>
+                    <li><a href="https://hackclub.com">Hack Club</a></li>
+                    <li><a href="https://github.com/ipython/xkcd-font">xkcd Font</a></li>
+                </ul>
             </div>
         </section>
     </main>
