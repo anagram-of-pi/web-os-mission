@@ -12,12 +12,13 @@
             <li>π</li>
             <li>File</li>
             <li>Edit</li>
-            <li>Pages
+            <li id="page-menu">Open
                 <div class="menu paper" style="display: none;">
                     <ul>
                         <li data-window="welcome">Welcome</li>
-                        <li data-window="browser">Browser</li>
                         <li data-window="about">About This Project</li>
+                        <li data-window="browser">Browser</li>
+                        <!-- <li data-window="notes">Notes</li> -->
                         <li data-window="credits">Credits</li>
                     </ul>
                 </div>
@@ -25,10 +26,10 @@
             <li>Window
                 <div class="menu paper" style="display: none;">
                     <ul>
-                        <li data-window="welcome">Welcome</li>
-                        <li data-window="browser">Browser</li>
-                        <li data-window="about">About This Project</li>
-                        <li data-window="credits">Credits</li>
+                        <li id="menu-window-fullscreen-os">Fullscreen OS</li>
+                        <li id="menu-window-fullscreen-window">Fullscreen Window</li>
+                        <li id="menu-window-close-window">Close Window</li>
+                        <li id="menu-window-close-all">Close All</li>
                     </ul>
                 </div>
             </li>
@@ -123,6 +124,15 @@
                     <li><a href="https://hackclub.com">Hack Club</a></li>
                     <li><a href="https://github.com/ipython/xkcd-font">xkcd Font</a></li>
                 </ul>
+            </div>
+        </section>
+        <section class="window" name="notes" style="display: none;">
+            <nav class="window-nav">
+                <h1 class="title">Notes</h1>
+                <button class="btn-close">x</button>
+            </nav>
+            <div class="window-content paper">
+                <textarea name="note" id="note-app-note" placeholder="Start typing..."></textarea>
             </div>
         </section>
     </main>

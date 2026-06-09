@@ -1,5 +1,4 @@
 /* TODO
-    * Menu bar
     * Keyboard shortcuts
         * Search bar
     * Fake files
@@ -88,6 +87,9 @@ function saveWindowData() {
         windowData[name] = data;
     });
 
+    console.log(document.getElementById("note-app-note").value)
+    windowData["noteContent"] = [document.getElementById("note-app-note").value];
+
     window.localStorage.setItem("windowData", JSON.stringify(windowData));
 }
 
@@ -120,7 +122,12 @@ function loadWindowData() {
                 windowEl.style.left = clamp(parseInt(windowEl.style.left), minX, maxX) + "px";
                 windowEl.style.top = clamp(parseInt(windowEl.style.top), minY, maxY) + "px";
             }
+
+            console.log(windowData["noteContent"][0])
+            document.getElementById("note-app-note").value = windowData["noteContent"][0];
+            console.log(document.getElementById("note-app-note").value)
         });
+
     }
 }
 
@@ -257,6 +264,30 @@ function bringToFront(windowEl) {
     activeWindow.style.zIndex = windows.length + 2;
 }
 
+function toggleFullScreen(element) {
+    const documentEl = document.documentElement;
+
+    var requestMethod = element.requestFullScreen || element.webkitRequestFullScreen || element.mozRequestFullScreen || element.msRequestFullScreen;
+
+    if (requestMethod) {
+        if (!document.fullscreenElement) {
+            // If the document can fullscreen and is not already in full screen mode
+            // make the element full screen
+            requestMethod.call(element);
+        } else {
+            // Otherwise exit the full screen
+            document.exitFullscreen?.();
+        }
+    } else {
+        if (!document.fullscreenElement) {
+            documentEl.requestFullscreen?.();
+        } else {
+            documentEl.exitFullscreen?.();
+        }
+    }
+}
+
+
 
 
 
@@ -293,7 +324,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Make menu bar open context menu
-    document.querySelectorAll("#desktop-nav ul li").forEach((item) => {
+    document.querySelectorAll("#menus > li").forEach((item) => {
         let menuEl = item.querySelector(".menu");
         item.addEventListener("click", (e) => {
             e.stopPropagation();
@@ -311,12 +342,39 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Make menu buttons open windows
-    document.querySelectorAll(".menu ul li").forEach((menuItem) => {
+    // Make menu buttons open windows and do things
+    document.querySelectorAll("#menus li ul li").forEach((menuItem) => {
         menuItem.addEventListener("click", (e) => {
             if (menuItem.getAttribute("data-window")) {
                 e.preventDefault();
                 openWindow(document.querySelector(`[name='${menuItem.getAttribute("data-window")}']`))
+            }
+            switch (menuItem.getAttribute("id")) {
+                case "menu-window-fullscreen-os": 
+                    e.preventDefault();
+                    toggleFullScreen(document);
+                    break;
+
+                case "menu-window-fullscreen-window":
+                    e.preventDefault();
+                    activeWindow.style.width = "100%";
+                    activeWindow.style.height = "100%";
+                    let desktopEl = document.getElementById("desktop");
+                    let desktopNavEl = document.getElementById("desktop-nav");
+                    let positionX = ((desktopEl.style.width) / 2) - ((activeWindow.style.width) / 2)
+                    let positionY = ((desktopEl.style.height) / 2) - ((activeWindow.style.height) / 2)
+                    activeWindow.style.left = clamp(positionX, minX, maxX) + "px";
+                    activeWindow.style.top = clamp(positionY, minY, maxY) + "px";
+                    break;
+
+                case "menu-window-close-window":
+                    closeWindow(activeWindow);
+                    console.log("a")
+                    break;
+
+                case "menu-window-close-all":
+                    windows.forEach((win) => {closeWindow(win)})
+                    break;
             }
 
         })
@@ -324,7 +382,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
     handleBrowser();
 
-    // Save windows every 10 seconds
-    setInterval(saveWindowData, 10_000);
 });
+
+// Save windows every 5 seconds
+setInterval(saveWindowData, 5000);
 
