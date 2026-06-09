@@ -2,12 +2,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Pi WebOS</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <nav id="nav">
+    <nav id="desktop-nav">
         <ul id="menus">
+            <li>π</li>
             <li>File</li>
             <li>Edit</li>
             <li>Pages</li>
@@ -19,13 +20,36 @@
             <li id="browser">Browser</li>
         </ul>
     </nav>
-    <main class="paper">
-        <section class="window">
+    <main class="paper" id="desktop">
+        <section class="window" name="welcome">
             <nav class="window-nav">
-                <h1 class="title">Window Name</h1>
+                <h1 class="title">Welcome</h1>
                 <button class="btn-close">x</button>
             </nav>
-            <div class="window-content paper"></div>
+            <div class="window-content paper">
+                <h1>Welcome!</h1>
+                <p>This is my WebOS app, made with pure HTML, CSS, and JS. You can learn more about this project in the <span class="text-code-block">About This Project</span> window.</p>
+                <p>To navigate to other windows, find the <span class="text-code-block">Window</span> option in the top menu and choose which to open.</p>
+            </div>
+        </section>
+        <section class="window" name="browser">
+            <nav class="window-nav">
+                <h1 class="title">Website</h1>
+                <button class="btn-close">x</button>
+            </nav>
+            <div class="window-content">
+                <!-- <iframe src="https://hackclub.com" title="duckduckgo.com" frameborder="0"></iframe> -->
+            </div>
+        </section>
+        <section class="window" name="credits">
+            <nav class="window-nav">
+                <h1 class="title">Credits</h1>
+                <button class="btn-close">x</button>
+            </nav>
+            <div class="window-content paper">
+                <h1>Credits</h1>
+                <p">xkcd Font: https://github.com/ipython/xkcd-font</p>
+            </div>
         </section>
     </main>
 

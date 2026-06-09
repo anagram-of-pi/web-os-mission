@@ -1,25 +1,59 @@
-function getBrowserName() {
-  const userAgent = navigator.userAgent;
+/* TODO
+    * Double click fullscreen
+    * Keyboard shortcuts
+        * Search bar
+    * Fake files
+    * Save window sizes
+    * Save open windows
+    * Light dark mode
+*/
+/* Apps:
+    * Calculator
+    * Notes
+    * Stopwatch
+    * Browser
+*/
 
-  if (userAgent.includes("Edg")) {
-    return "Microsoft Edge";
-  } else if (userAgent.includes("OPR") || userAgent.includes("Opera")) {
-    return "Opera";
-  } else if (userAgent.includes("Chrome")) {
-    return "Google Chrome";
-  } else if (userAgent.includes("Firefox")) {
-    return "Mozilla Firefox";
-  } else if (userAgent.includes("Safari")) {
-    return "Apple Safari";
-  } else if (userAgent.includes("Trident") || userAgent.includes("MSIE")) {
-    return "Internet Explorer";
-  }
-  
-  return "Unknown Browser";
+function getBrowserName() {
+    const userAgent = navigator.userAgent;
+
+    if (userAgent.includes("Edg")) {
+        return "Edge";
+    } else if (userAgent.includes("OPR") || userAgent.includes("Opera")) {
+        return "Opera";
+    } else if (userAgent.includes("Chrome")) {
+        return "Chrome";
+    } else if (userAgent.includes("Firefox")) {
+        return "Firefox";
+    } else if (userAgent.includes("Safari")) {
+        return "Safari";
+    } else if (userAgent.includes("Trident") || userAgent.includes("MSIE")) {
+        return "Internet Explorer";
+    }
+
+    return "Unknown Browser";
+}
+function getOSName() {
+  const ua = navigator.userAgent;
+
+  if (ua.includes("Windows")) return "Windows";
+  if (ua.includes("Mac")) return "macOS";
+  if (ua.includes("Linux")) return "Linux";
+  if (ua.includes("Android")) return "Android";
+  if (ua.includes("iPhone") || ua.includes("iPad")) return "iOS";
+
+  return "Unknown";
 }
 
+const browserName = getBrowserName();
+const OSName = getOSName();
+
+
+const clamp = (num, min, max) => Math.min(Math.max(num, min), max);
+
 function updateInformation() {
-    let browserName = getBrowserName();
+    // let browserName = getBrowserName();
+    // let OSName = getOSName();
     let timeString = new Date().toLocaleTimeString();
     let dateString = new Date().toLocaleDateString();
 
@@ -27,31 +61,97 @@ function updateInformation() {
     let timeEl = document.getElementById("time");
     let dateEl = document.getElementById("date");
 
-    browserEl.textContent = browserName;
+    browserEl.textContent = `${browserName}/${OSName}`;
     timeEl.textContent = timeString;
     dateEl.textContent = dateString;
 }
 
+function closeWindow(windowEl) {
+    windowEl.style.display = "none"
+}
+function openWindow(windowEl) {
+    windowEl.style.display = "flex"
+}
+
+function saveWindowData() {
+    let windowData = {};
+    windows.forEach((windowEl) => {
+        let name = windowEl.getAttribute("name");
+        let data = {};
+
+        data["left"] = windowEl.style.left;
+        data["top"] = windowEl.style.top;
+        data["width"] = windowEl.style.width;
+        data["height"] = windowEl.style.height;
+        data["zIndex"] = windowEl.style.zIndex;
+        data["isOpen"] = windowEl.style.display != "none";
+
+        windowData[name] = data;
+    });
+
+    window.localStorage.setItem("windowData", JSON.stringify(windowData));
+}
+
+function loadWindowData() {
+    // Update window positions
+    let windowData = JSON.parse(window.localStorage.getItem("windowData"));
+    if (windowData) {
+        windows.forEach((windowEl) => {
+            let name = windowEl.getAttribute("name");
+            let data = windowData[name];
+            
+            windowEl.style.left = data["left"];
+            windowEl.style.top = data["top"];
+            windowEl.style.width = data["width"];
+            windowEl.style.height = data["height"];
+            windowEl.style.zIndex = data["zIndex"];
+            windowEl.style.display = data["isOpen"] ? "flex" : "none";
+        });
+    }
+}
+
+let activeWindow = null;
 // Adapted from (https://jams.hackclub.com/batch/webOS/part-3), originally W3 School
 // Step 1: Define a function called `dragElement` that makes an HTML element draggable.
 function dragElement(element) {
     // Step 2: Set up variables to keep track of the element's position.
     var initialX = 0;
     var initialY = 0;
-    var currentX = 0;
-    var currentY = 0;
+    var deltaX = 0;
+    var deltaY = 0;
+    var dragOffsetX = 0;
+    var dragOffsetY = 0;
 
-    windowNavEl = element.parentElement.querySelector('.window-header');
-    windowEl = element.parentElement;
+    let snapBackDist = 20
+
+    let desktopEl = document.getElementById("desktop");
+    let desktopNavEl = document.getElementById("desktop-nav");
+    let windowEl = element;
+    let windowNavEl = element.querySelector(".window-nav");
+    let windowContentEl = element.querySelector(".window-content");
+    let windowName = element.getAttribute("name");
+
+    const minX = - (windowNavEl.clientWidth / 2);
+    const maxX = (desktopEl.clientWidth - windowNavEl.clientWidth) + (windowNavEl.clientWidth / 2);
+    const minY = desktopNavEl.clientHeight;
+    const maxY = desktopNavEl.clientHeight + desktopEl.clientHeight - windowNavEl.clientHeight;
+
+    // let startPos = window.localStorage.getItem(windowName);
+    // if (startPos) {
+    //     startPos = startPos.split(",")
+    //     windowEl.style.left = clamp(parseInt(startPos[0]), minX + snapBackDist, maxX - snapBackDist) + "px";
+    //     windowEl.style.top = clamp(parseInt(startPos[1]), minY, maxY - snapBackDist) + "px";
+    // }
+
     // Step 3: Check if there is a special header element associated with the draggable element.
     if (windowNavEl) {
         // Step 4: If present, assign the `dragMouseDown` function to the header's `onmousedown` event.
         // This allows you to drag the window around by its header.
-        windowNavEl.onmousedown = startDragging;
+        windowNavEl.addEventListener("mousedown", startDragging);
     } else {
         // Step 5: If not present, assign the function directly to the draggable element's `onmousedown` event.
         // This allows you to drag the window by holding down anywhere on the window.
-        element.onmousedown = startDragging;
+        windowEl.onmousedown = startDragging;
     }
 
     // Step 6: Define the `startDragging` function to capture the initial mouse position and set up event listeners.
@@ -61,43 +161,84 @@ function dragElement(element) {
         // Step 7: Get the mouse cursor position at startup.
         initialX = e.clientX;
         initialY = e.clientY;
+
+        // Get the viewport-relative bounding rectangle of the target element
+        const rect = e.currentTarget.getBoundingClientRect();
+
+        // Calculate X and Y mouse pos relative to element
+        dragOffsetX = e.clientX - rect.left;
+        dragOffsetY = e.clientY - rect.top;
         // Step 8: Set up event listeners for mouse movement (`elementDrag`) and mouse button release (`closeDragElement`).
-        document.onmouseup = stopDragging;
-        document.onmousemove = dragElement;
+        document.addEventListener("mouseup", stopDragging);
+        document.addEventListener("mousemove", elementDrag);
     }
 
     // Step 9: Define the `elementDrag` function to calculate the new position of the element based on mouse movement.
-    function dragElement(e) {
+    function elementDrag(e) {
+
         e = e || window.event;
         e.preventDefault();
         // Step 10: Calculate the new cursor position.
-        currentX = initialX - e.clientX;
-        currentY = initialY - e.clientY;
-        initialX = e.clientX;
-        initialY = e.clientY;
+        deltaX = initialX - e.clientX;
+        deltaY = initialY - e.clientY;
+
+        positionX = initialX - deltaX - dragOffsetX;
+        positionY = initialY - deltaY - dragOffsetY;
+
         // Step 11: Update the element's new position by modifying its `top` and `left` CSS properties.
-        windowEl.style.top = (windowEl.offsetTop - currentY) + "px";
-        windowEl.style.left = (windowEl.offsetLeft - currentX) + "px";
+        windowEl.style.left = clamp(positionX, minX, maxX) + "px";
+        windowEl.style.top = clamp(positionY, minY, maxY) + "px";
+        // windowEl.style.left = positionX + "px";
+        // windowEl.style.top = positionY + "px";
     }
 
     // Step 12: Define the `stopDragging` function to stop tracking mouse movement by removing the event listeners.
     function stopDragging() {
-        document.onmouseup = null;
-        document.onmousemove = null;
+        document.removeEventListener("mouseup", stopDragging)
+        document.removeEventListener("mousemove", elementDrag)
+
+        windowEl.style.left = clamp(parseInt(windowEl.style.left), minX + snapBackDist, maxX - snapBackDist) + "px";
+        windowEl.style.top = clamp(parseInt(windowEl.style.top), minY, maxY - snapBackDist) + "px";
+
+        window.localStorage.setItem(windowName, [windowEl.style.left, windowEl.style.top]);
     }
 }
+
+function bringToFront(windowEl) {
+    activeWindow = windowEl;
+    windows.forEach((el) => {
+        el.style.zIndex = clamp((el.style.zIndex - 1), 3, 999);
+    });
+    activeWindow.style.zIndex = windows.length + 2;
+}
+
+
 
 
 // ---------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
-    setInterval(updateInformation, 1000)
+    windows = document.querySelectorAll(".window");
     
-    document.querySelectorAll(".window-nav").forEach((el) => dragElement(el))
+    // Update clock, date, etc. once per second
+    setInterval(updateInformation, 1000);
     
+    loadWindowData();
+    
+    // Make all windows draggable
+    windows.forEach((el) => {
+        dragElement(el);
+        
+        // Make windows go to front when clicked
+        el.addEventListener("mousedown", e => bringToFront(el))
+    });
+    
+    // Make close buttons work
     document.querySelectorAll(".window-nav .btn-close").forEach((el) => {
-        el.addEventListener("click", () => el.parentElement.parentElement.style.display = "none");
+        el.addEventListener("click", () => closeWindow(el.parentElement.parentElement));
     })
-});
 
+    // Save windows every 10 seconds
+    setInterval(saveWindowData, 10_000);
+});
 
