@@ -87,7 +87,6 @@ function saveWindowData() {
         windowData[name] = data;
     });
 
-    console.log(document.getElementById("note-app-note").value)
     windowData["noteContent"] = [document.getElementById("note-app-note").value];
 
     window.localStorage.setItem("windowData", JSON.stringify(windowData));
@@ -123,9 +122,7 @@ function loadWindowData() {
                 windowEl.style.top = clamp(parseInt(windowEl.style.top), minY, maxY) + "px";
             }
 
-            console.log(windowData["noteContent"][0])
             document.getElementById("note-app-note").value = windowData["noteContent"][0];
-            console.log(document.getElementById("note-app-note").value)
         });
 
     }
@@ -369,7 +366,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                 case "menu-window-close-window":
                     closeWindow(activeWindow);
-                    console.log("a")
                     break;
 
                 case "menu-window-close-all":

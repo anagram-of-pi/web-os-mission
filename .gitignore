@@ -6,7 +6,8 @@
 example.html
 
 .DS_Store
-
+tmp/
+tmp/*
 
 
 # User-specific files
