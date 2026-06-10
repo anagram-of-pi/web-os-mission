@@ -245,57 +245,53 @@ div {
     font-size: 0.75em;
 }
 
-.window-content #browser-page {
+.wrapper #browser-page {
     width: 100%;
     flex: 1;
     border: none;
 }
 
-.window-content {
-    padding: 2rem;
-}
-
-.window-content h1 {
+.wrapper h1 {
     width: 100%;
     text-align: center;
     margin-bottom: 1rem;
     font-family: var(--font-title);
 }
 
-.window-content h2 {
+.wrapper h2 {
     width: 100%;
     text-align: center;
     margin-bottom: 1rem;
     font-family: var(--font-title);
 }
 
-.window-content p {
+.wrapper p {
     width: 100%;
     font-family: var(--font-normal);
 }
 
-.window-content ul {
+.wrapper ul {
     width: 100%;
     font-family: var(--font-normal);
 }
 
-.window-content ul, ol {
+.wrapper ul, ol {
   padding-left: 20px;
   margin-left: 0;
 }
 
-.window-content li {
+.wrapper li {
   display: list-item;
   list-style-position: inside;
 }
 
-.window[name="browser"] .window-content {
+.window[name="browser"] .window-content .wrapper {
     padding: 1rem;
     display: flex;
     flex-direction: column;
 }
 
-.window .window-content form {
+.window .window-content .wrapper form {
     width: 100%;
     display: flex;
     flex-direction: row;
@@ -349,10 +345,14 @@ div {
 #note-app-note {
     width: 100%;
     height: 100%;
-    background: none;
+    padding: 2rem;
     border: none;
     font-family: xkcd, sans-serif;
     font-size: 1.25em;
 }
 
-
+.wrapper {
+    padding: 2rem;
+    min-height: 100%;
+    height: min-content;
+}

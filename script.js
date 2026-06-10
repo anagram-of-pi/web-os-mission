@@ -1,6 +1,5 @@
 /* TODO
-    * Keyboard shortcuts
-        * Search bar
+        * Search bar?
     * Fake files
     * Light dark mode
 */
@@ -9,6 +8,7 @@
     * Notes
     * Stopwatch
     * Browser
+    * Settings
 */
 
 function getBrowserName() {
@@ -299,11 +299,12 @@ document.addEventListener("DOMContentLoaded", () => {
     loadWindowData();
     
     // Make all windows draggable
-    windows.forEach((el) => {
-        dragElement(el);
+    windows.forEach((win) => {
+        // Make windows draggable
+        dragElement(win);
         
         // Make windows go to front when clicked
-        el.addEventListener("mousedown", e => bringToFront(el))
+        win.addEventListener("mousedown", e => bringToFront(win))
     });
     
     // Make close buttons work
@@ -311,12 +312,33 @@ document.addEventListener("DOMContentLoaded", () => {
         el.addEventListener("click", () => closeWindow(el.parentElement.parentElement));
     })
 
+    // Make esc key close active window
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") {
+            if (e.shiftKey) {
+                windows.forEach((win) => closeWindow(win));
+            } else {
+                closeWindow(activeWindow);
+            }
+        }
+        // Open with command z
+        if (e.key.toLowerCase() === 'z' && (e.metaKey || e.ctrlKey)) {
+            // Prevent normal cmd z action
+            // event.preventDefault(); 
+            // Actually keep it so that cmd z still works on text for example
+            
+            // Reopen last closed (as long as another window isn't focused)
+            openWindow(activeWindow);
+        }
+
+    })
+
     // Make inlinks open windows
     document.querySelectorAll(".inlink").forEach((link) => {
         link.addEventListener("click", (e) => {
             e.preventDefault();
+            console.log("a")
             openWindow(document.querySelector(`[name='${link.getAttribute("data-window")}']`))
-
         })
     });
 
@@ -356,6 +378,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     e.preventDefault();
                     activeWindow.style.width = "100%";
                     activeWindow.style.height = "100%";
+                    const minX = - (windowNavEl.clientWidth / 2);
+                    const maxX = (desktopEl.clientWidth - windowNavEl.clientWidth) + (windowNavEl.clientWidth / 2);
+                    const minY = desktopNavEl.clientHeight;
+                    const maxY = desktopNavEl.clientHeight + desktopEl.clientHeight - windowNavEl.clientHeight;
                     let desktopEl = document.getElementById("desktop");
                     let desktopNavEl = document.getElementById("desktop-nav");
                     let positionX = ((desktopEl.style.width) / 2) - ((activeWindow.style.width) / 2)
