@@ -1,7 +1,7 @@
 /* TODO
         * Search bar?
-    * Fake files
     * Light dark mode
+    * Mobile support
 */
 /* Apps:
     * Calculator
@@ -87,7 +87,18 @@ function saveWindowData() {
         windowData[name] = data;
     });
 
-    windowData["noteContent"] = [document.getElementById("note-app-note").value];
+    document.querySelectorAll(".file").forEach((fileEl) => {
+        let name = fileEl.getAttribute("name");
+        let data = {};
+
+        data["left"] = fileEl.style.left;
+        data["top"] = fileEl.style.top;
+        
+        windowData[name] = data;
+    });
+
+    windowData["noteContent"] = document.getElementById("note-app-note").value;
+    windowData["theme"] = document.getElementById("light-dark-mode").value;
 
     window.localStorage.setItem("windowData", JSON.stringify(windowData));
 }
@@ -122,9 +133,36 @@ function loadWindowData() {
                 windowEl.style.top = clamp(parseInt(windowEl.style.top), minY, maxY) + "px";
             }
 
-            document.getElementById("note-app-note").value = windowData["noteContent"][0];
+            if (windowData["noteContent"]) {
+                document.getElementById("note-app-note").value = windowData["noteContent"][0];
+            }
         });
 
+        document.querySelectorAll(".file").forEach((fileEl) => {
+            let name = fileEl.getAttribute("name");
+            let data = windowData[name];
+            if (data) {
+                fileEl.style.left = data["left"];
+                fileEl.style.top = data["top"];
+            }
+        });
+        
+        if (windowData["theme"]) {
+            switch (windowData["theme"]) {
+                case "light":
+                    setLightTheme();
+                    break;    
+                case "dark":
+                    setDarkTheme();
+                    break;    
+                case "custom":
+                    setCustomTheme();
+                    break;    
+                default:
+                    setLightTheme();
+                    break;
+            }
+        }
     }
 }
 
@@ -156,6 +194,31 @@ function handleBrowser() {
 
 }
 
+function defineBounds(element, desktopEl, desktopNavEl) {
+    let windowNavEl = element.querySelector(".window-nav");
+
+    let minX = 0;
+    let maxX = 0;
+    let minY = 0;
+    let maxY = 0;
+    
+    // If it has a nev to drag it by
+    if (windowNavEl) {
+        minX = - (windowNavEl.clientWidth / 2);
+        maxX = (desktopEl.clientWidth - windowNavEl.clientWidth) + (windowNavEl.clientWidth / 2);
+        minY = desktopNavEl.clientHeight;
+        maxY = desktopNavEl.clientHeight + desktopEl.clientHeight - windowNavEl.clientHeight;
+    } else {
+        minX = 0;
+        maxX = (desktopEl.clientWidth - element.clientWidth);
+        minY = desktopNavEl.clientHeight;
+        maxY = desktopNavEl.clientHeight + desktopEl.clientHeight - element.clientHeight;
+    }
+
+
+    return { minX, maxX, minY, maxY };
+}
+
 let activeWindow = null;
 // Adapted from (https://jams.hackclub.com/batch/webOS/part-3), originally W3 School
 // Step 1: Define a function called `dragElement` that makes an HTML element draggable.
@@ -172,25 +235,11 @@ function dragElement(element) {
 
     let desktopEl = document.getElementById("desktop");
     let desktopNavEl = document.getElementById("desktop-nav");
-    let windowEl = element;
-    let windowNavEl = element.querySelector(".window-nav");
-    let windowContentEl = element.querySelector(".window-content");
-    let windowName = element.getAttribute("name");
+    let dragEl = element;
+    let windowNavEl = dragEl.querySelector(".window-nav");
+    let windowContentEl = dragEl.querySelector(".window-content");
 
-    const minX = - (windowNavEl.clientWidth / 2);
-    const maxX = (desktopEl.clientWidth - windowNavEl.clientWidth) + (windowNavEl.clientWidth / 2);
-    const minY = desktopNavEl.clientHeight;
-    const maxY = desktopNavEl.clientHeight + desktopEl.clientHeight - windowNavEl.clientHeight;
-
-    // Make double click fullscreen the window
-    windowNavEl.addEventListener("dblclick", (e) => {
-        windowEl.style.width = "100%";
-        windowEl.style.height = "100%";
-        let positionX = ((desktopEl.style.width) / 2) - ((windowEl.style.width) / 2)
-        let positionY = ((desktopEl.style.height) / 2) - ((windowEl.style.height) / 2)
-        windowEl.style.left = clamp(positionX, minX, maxX) + "px";
-        windowEl.style.top = clamp(positionY, minY, maxY) + "px";
-    })
+    const { minX, maxX, minY, maxY } = defineBounds(dragEl, desktopEl, desktopNavEl);
 
     // Step 3: Check if there is a special header element associated with the draggable element.
     if (windowNavEl) {
@@ -200,7 +249,7 @@ function dragElement(element) {
     } else {
         // Step 5: If not present, assign the function directly to the draggable element's `onmousedown` event.
         // This allows you to drag the window by holding down anywhere on the window.
-        windowEl.onmousedown = startDragging;
+        dragEl.onmousedown = startDragging;
     }
 
     // Step 6: Define the `startDragging` function to capture the initial mouse position and set up event listeners.
@@ -217,6 +266,7 @@ function dragElement(element) {
         // Calculate X and Y mouse pos relative to element
         dragOffsetX = e.clientX - rect.left;
         dragOffsetY = e.clientY - rect.top;
+        console.log(element)
         // Step 8: Set up event listeners for mouse movement (`elementDrag`) and mouse button release (`closeDragElement`).
         document.addEventListener("mouseup", stopDragging);
         document.addEventListener("mousemove", elementDrag);
@@ -235,8 +285,8 @@ function dragElement(element) {
         positionY = initialY - deltaY - dragOffsetY;
 
         // Step 11: Update the element's new position by modifying its `top` and `left` CSS properties.
-        windowEl.style.left = clamp(positionX, minX, maxX) + "px";
-        windowEl.style.top = clamp(positionY, minY, maxY) + "px";
+        dragEl.style.left = clamp(positionX, minX, maxX) + "px";
+        dragEl.style.top = clamp(positionY, minY, maxY) + "px";
         // windowEl.style.left = positionX + "px";
         // windowEl.style.top = positionY + "px";
     }
@@ -246,10 +296,8 @@ function dragElement(element) {
         document.removeEventListener("mouseup", stopDragging)
         document.removeEventListener("mousemove", elementDrag)
 
-        windowEl.style.left = clamp(parseInt(windowEl.style.left), minX + snapBackDist, maxX - snapBackDist) + "px";
-        windowEl.style.top = clamp(parseInt(windowEl.style.top), minY, maxY - snapBackDist) + "px";
-
-        window.localStorage.setItem(windowName, [windowEl.style.left, windowEl.style.top]);
+        dragEl.style.left = clamp(parseInt(dragEl.style.left), minX + snapBackDist, maxX - snapBackDist) + "px";
+        dragEl.style.top = clamp(parseInt(dragEl.style.top), minY, maxY - snapBackDist) + "px";
     }
 }
 
@@ -284,6 +332,37 @@ function toggleFullScreen(element) {
     }
 }
 
+function setLightTheme() {
+    const htmlEl = document.documentElement;
+
+    htmlEl.style.setProperty("--paper-color", "var(--paper-color-light)");
+    htmlEl.style.setProperty("--paper-background", "var(--paper-background-light)");
+    htmlEl.style.setProperty("--border-color", "var(--border-color-light)");
+    htmlEl.style.setProperty("--code-block", "var(--code-block-light)");
+    htmlEl.style.setProperty("--text-color", "var(--text-color-light)");
+    htmlEl.style.setProperty("--link-color", "var(--link-color-light)");
+}
+function setDarkTheme() {
+    const htmlEl = document.documentElement;
+
+    htmlEl.style.setProperty("--paper-color", "var(--paper-color-dark)");
+    htmlEl.style.setProperty("--paper-background", "var(--paper-background-dark)");
+    htmlEl.style.setProperty("--border-color", "var(--border-color-dark)");
+    htmlEl.style.setProperty("--code-block", "var(--code-block-dark)");
+    htmlEl.style.setProperty("--text-color", "var(--text-color-dark)");
+    htmlEl.style.setProperty("--link-color", "var(--link-color-dark)");
+}
+function setCustomTheme() {
+    const htmlEl = document.documentElement;
+
+    htmlEl.style.setProperty("--paper-color", "var(--paper-color-custom)");
+    htmlEl.style.setProperty("--paper-background", "var(--paper-background-custom)");
+    htmlEl.style.setProperty("--border-color", "var(--border-color-custom)");
+    htmlEl.style.setProperty("--code-block", "var(--code-block-custom)");
+    htmlEl.style.setProperty("--text-color", "var(--text-color-custom)");
+    htmlEl.style.setProperty("--link-color", "var(--link-color-custom)");
+}
+
 
 
 
@@ -305,6 +384,33 @@ document.addEventListener("DOMContentLoaded", () => {
         
         // Make windows go to front when clicked
         win.addEventListener("mousedown", e => bringToFront(win))
+
+        
+        // Make double click fullscreen the window
+        let windowNavEl = win.querySelector(".window-nav");
+        let desktopEl = document.getElementById("desktop");
+        let desktopNavEl = document.getElementById("desktop-nav");
+        const { minX, maxX, minY, maxY } = defineBounds(win, desktopEl, desktopNavEl);
+        windowNavEl.addEventListener("dblclick", (e) => {
+        win.style.width = "100%";
+        win.style.height = "100%";
+        let positionX = ((desktopEl.style.width) / 2) - ((win.style.width) / 2)
+        let positionY = ((desktopEl.style.height) / 2) - ((win.style.height) / 2)
+        win.style.left = clamp(positionX, minX, maxX) + "px";
+        win.style.top = clamp(positionY, minY, maxY) + "px";
+    })
+    });
+
+    // Make files draggable and clickable
+    document.querySelectorAll(".file").forEach((file) => {
+        dragElement(file);
+
+        file.addEventListener("dblclick", () => {
+            let windowName = file.getAttribute("data-window");
+            if (windowName) {
+                openWindow(document.getElementsByName(windowName)[0])
+            }
+        });
     });
     
     // Make close buttons work
@@ -402,10 +508,30 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     });
 
+    // Dark/light theme select
+    document.getElementById("light-dark-mode").addEventListener("change", (e) => {
+        const selectedValue = e.target.value; 
+
+        
+        switch (selectedValue) {
+            case "light":
+                setLightTheme();
+                break;    
+            case "dark":
+                setDarkTheme();
+                break;    
+            case "custom":
+                setCustomTheme();
+                break;    
+            default:
+                setLightTheme();
+                break;
+        }
+    })
+
     handleBrowser();
 
 });
 
 // Save windows every 5 seconds
 setInterval(saveWindowData, 5000);
-

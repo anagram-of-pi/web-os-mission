@@ -18,6 +18,7 @@
                         <li data-window="welcome">Welcome</li>
                         <li data-window="about">About This Project</li>
                         <li data-window="browser">Browser</li>
+                        <li data-window="settings">Settings</li>
                         <li data-window="notes">Notes</li>
                         <li data-window="credits">Credits</li>
                     </ul>
@@ -90,6 +91,7 @@
                         <li>Moveable, resizable, closable windows</li>
                         <li>Window positions save on reload</li>
                         <li>Correct Z ordering after opening a page</li>
+                        <li>Draggable files/apps</li>
                         <li>Double click menu bar to fullscreen window</li>
                         <li>Window cannot leave desktop</li>
                         <li>Window snaps back into frame</li>
@@ -105,13 +107,12 @@
                         <li>Fullscreen OS</li>
                         <li>Browser/OS detection</li>
                         <li>Links that open windows in the OS</li>
+                        <li>Keyboard shortcuts (esc, shift + esc, cmd + z)</li>
+                        <li>Customizable themes through the settings app</li>
                     </ul>
                     <br>
                     <h2>Planned Features</h2>
                     <ul>
-                        <li>Keyboard Shortcuts</li>
-                        <li>Draggable files on desktop</li>
-                        <li>Light/dark mode/themes</li>
                         <li>Customizable wallpaper</li>
                         <li>Calculator App</li>
                         <li>Stopwatch App</li>
@@ -143,6 +144,24 @@
                 </div>
             </div>
         </section>
+        <section class="window" name="settings" style="display: none;">
+            <nav class="window-nav">
+                <h1 class="title">Settings</h1>
+                <button class="btn-close">x</button>
+            </nav>
+            <div class="window-content">
+                <div class="wrapper paper">
+                    <h1>Settings</h1>
+                    
+                    <label for="light-dark-mode">Theme:</label>
+                    <select name="light-dark-mode" id="light-dark-mode">
+                        <option value="light">Light Mode</option>
+                        <option value="dark">Dark Mode</option>
+                        <option value="custom">Custom Theme</option>
+                    </select>
+                </div>
+            </div>
+        </section>
         <section class="window" name="notes" style="display: none;">
             <nav class="window-nav">
                 <h1 class="title">Notes</h1>
@@ -152,6 +171,11 @@
                 <textarea name="note" id="note-app-note" placeholder="Start typing..." class="paper"></textarea>
             </div>
         </section>
+
+        <div class="file" data-window="about" name="file-about">
+            <div class="icon"></div>
+            <p class="file-name">About This Project</p>
+        </div>
     </main>
 
     <script src="script.js"></script>
