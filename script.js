@@ -1,14 +1,10 @@
 /* TODO
         * Search bar?
-    * Light dark mode
     * Mobile support
 */
 /* Apps:
     * Calculator
-    * Notes
     * Stopwatch
-    * Browser
-    * Settings
 */
 
 function getBrowserName() {
@@ -97,10 +93,17 @@ function saveWindowData() {
         windowData[name] = data;
     });
 
+    document.querySelectorAll("input[type='color']").forEach((pickerEl) => {
+        let name = pickerEl.getAttribute("name");
+        windowData[name] = pickerEl.value
+    })
+
     windowData["noteContent"] = document.getElementById("note-app-note").value;
     windowData["theme"] = document.getElementById("light-dark-mode").value;
 
     window.localStorage.setItem("windowData", JSON.stringify(windowData));
+
+    console.log("Saved Window Positions!")
 }
 
 function loadWindowData() {
@@ -134,7 +137,7 @@ function loadWindowData() {
             }
 
             if (windowData["noteContent"]) {
-                document.getElementById("note-app-note").value = windowData["noteContent"][0];
+                document.getElementById("note-app-note").value = windowData["noteContent"];
             }
         });
 
@@ -163,6 +166,19 @@ function loadWindowData() {
                     break;
             }
         }
+
+        document.querySelectorAll("input[type='color']").forEach((pickerEl) => {
+            let name = pickerEl.getAttribute("name");
+            if (windowData[name]) {
+                pickerEl.value = windowData[name]
+            }
+        })
+        document.documentElement.style.setProperty("--paper-color-custom", document.getElementById("custom-paper-color").value);
+        document.documentElement.style.setProperty("--paper-background-custom", document.getElementById("custom-bg").value);
+        document.documentElement.style.setProperty("--border-color-custom", document.getElementById("custom-border").value);
+        document.documentElement.style.setProperty("--code-block-custom", document.getElementById("custom-code").value);
+        document.documentElement.style.setProperty("--text-color-custom", document.getElementById("custom-text").value);
+        document.documentElement.style.setProperty("--link-color-custom", document.getElementById("custom-link").value);
     }
 }
 
@@ -266,7 +282,6 @@ function dragElement(element) {
         // Calculate X and Y mouse pos relative to element
         dragOffsetX = e.clientX - rect.left;
         dragOffsetY = e.clientY - rect.top;
-        console.log(element)
         // Step 8: Set up event listeners for mouse movement (`elementDrag`) and mouse button release (`closeDragElement`).
         document.addEventListener("mouseup", stopDragging);
         document.addEventListener("mousemove", elementDrag);
@@ -335,6 +350,8 @@ function toggleFullScreen(element) {
 function setLightTheme() {
     const htmlEl = document.documentElement;
 
+    document.getElementById("light-dark-mode").value = "light"
+
     htmlEl.style.setProperty("--paper-color", "var(--paper-color-light)");
     htmlEl.style.setProperty("--paper-background", "var(--paper-background-light)");
     htmlEl.style.setProperty("--border-color", "var(--border-color-light)");
@@ -345,6 +362,8 @@ function setLightTheme() {
 function setDarkTheme() {
     const htmlEl = document.documentElement;
 
+    document.getElementById("light-dark-mode").value = "dark"
+
     htmlEl.style.setProperty("--paper-color", "var(--paper-color-dark)");
     htmlEl.style.setProperty("--paper-background", "var(--paper-background-dark)");
     htmlEl.style.setProperty("--border-color", "var(--border-color-dark)");
@@ -354,6 +373,8 @@ function setDarkTheme() {
 }
 function setCustomTheme() {
     const htmlEl = document.documentElement;
+
+    document.getElementById("light-dark-mode").value = "custom"
 
     htmlEl.style.setProperty("--paper-color", "var(--paper-color-custom)");
     htmlEl.style.setProperty("--paper-background", "var(--paper-background-custom)");
@@ -443,7 +464,6 @@ document.addEventListener("DOMContentLoaded", () => {
     document.querySelectorAll(".inlink").forEach((link) => {
         link.addEventListener("click", (e) => {
             e.preventDefault();
-            console.log("a")
             openWindow(document.querySelector(`[name='${link.getAttribute("data-window")}']`))
         })
     });
@@ -528,6 +548,13 @@ document.addEventListener("DOMContentLoaded", () => {
                 break;
         }
     })
+
+    document.getElementById("custom-paper-color").addEventListener("input", (e) => {document.documentElement.style.setProperty("--paper-color-custom", e.target.value)});
+    document.getElementById("custom-bg").addEventListener("input", (e) => {document.documentElement.style.setProperty("--paper-background-custom", e.target.value)});
+    document.getElementById("custom-border").addEventListener("input", (e) => {document.documentElement.style.setProperty("--border-color-custom", e.target.value)});
+    document.getElementById("custom-code").addEventListener("input", (e) => {document.documentElement.style.setProperty("--code-block-custom", e.target.value)});
+    document.getElementById("custom-text").addEventListener("input", (e) => {document.documentElement.style.setProperty("--text-color-custom", e.target.value)});
+    document.getElementById("custom-link").addEventListener("input", (e) => {document.documentElement.style.setProperty("--link-color-custom", e.target.value)});
 
     handleBrowser();
 

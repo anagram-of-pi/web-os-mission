@@ -396,6 +396,8 @@ div {
 .file {
     width: 5rem;
     height: 4rem;
+    top: calc(var(--i) * (4rem + 20px) + 4rem);
+    left: 2rem;
     position: absolute;
     display: flex;
     flex-direction: column;

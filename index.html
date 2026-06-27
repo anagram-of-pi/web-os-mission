@@ -51,11 +51,11 @@
                 <div class="wrapper paper">
                     <h1>Welcome!</h1>
                     <p>Hi, I'm <strong>Pi</strong>, and this is my WebOS app, made with pure HTML, CSS, and JS. You can learn more about this project in the <span class="text-code-block"><a href="#" data-window="about" class="inlink">About This Project</a></span> window.</p>
-                    <p>To navigate to other windows, find the <span class="text-code-block">Open</span> option in the top menu and choose which to open. Alternatively, some links like <a href="#" data-window="about" class="inlink">this one</a> will also open a window. </p>
+                    <p>To navigate to other windows, find the <span class="text-code-block">Open</span> option in the top menu and choose which to open. Alternatively, some links like <a href="#" data-window="about" class="inlink">this one</a> will also open a window. Lastly, a few of the windows have interactive files on the desktop.</p>
                     <br>
                     <p>You can resize these windows by dragging the bottom left corner. Try it!</p>
                     <br>
-                    <p>Close the window with the <span class="text-code-block">x</span> in the top right corner of the window menu bar.</p>
+                    <p>Close the window with the <span class="text-code-block">x</span> in the top right corner of the window menu bar, or by pressing <span class="text-code-block">esc</span> while the window is focused.</p>
                 </div>
             </div>
         </section>
@@ -67,8 +67,8 @@
             <div class="window-content">
                 <div class="wrapper paper">
                     <form id="search-form">
-                        <input type="text" id="url-bar" placeholder="https://www.example.com/">
-                        <button id="search" type="submit">Go</button>
+                        <input type="text" id="url-bar" placeholder="https://www.example.com/" title="Many popular pages like google or GitHub don't work (they intentionally disable this), for complicated reasons. Try hackclub.com!">
+                        <button id="search" type="submit" title="Many popular pages like google or GitHub don't work (they intentionally disable this), for complicated reasons. Try hackclub.com!">Go</button>
                     </form>
                     <iframe src="https://www.example.com" title="website" frameborder="0" id="browser-page"></iframe>
                 </div>
@@ -91,7 +91,7 @@
                         <li>Moveable, resizable, closable windows</li>
                         <li>Window positions save on reload</li>
                         <li>Correct Z ordering after opening a page</li>
-                        <li>Draggable files/apps</li>
+                        <li>Draggable files/apps on desktop</li>
                         <li>Double click menu bar to fullscreen window</li>
                         <li>Window cannot leave desktop</li>
                         <li>Window snaps back into frame</li>
@@ -99,7 +99,8 @@
                             <ul>
                                 <li>Text Documents (like this one!)</li>
                                 <li>(Mostly) Functional Browser</li>
-                                <!-- <li>Notes App</li> -->
+                                <li>Notes App</li>
+                                <li>Settings App</li>
                             </ul>
                         </li>
                         <li>Menu bar</li>
@@ -159,6 +160,24 @@
                         <option value="dark">Dark Mode</option>
                         <option value="custom">Custom Theme</option>
                     </select>
+                    <br>
+                    <label for="custom-paper-color">Custom Theme (Accent):</label>
+                    <input type="color" name="custom-paper-color" id="custom-paper-color">
+                    <br>
+                    <label for="custom-bg">Custom Theme (Background):</label>
+                    <input type="color" name="custom-bg" id="custom-bg">
+                    <br>
+                    <label for="custom-border">Custom Theme (Border):</label>
+                    <input type="color" name="custom-border" id="custom-border">
+                    <br>
+                    <label for="custom-code">Custom Theme (Code Block):</label>
+                    <input type="color" name="custom-code" id="custom-code">
+                    <br>
+                    <label for="custom-text">Custom Theme (Text Color):</label>
+                    <input type="color" name="custom-text" id="custom-text">
+                    <br>
+                    <label for="custom-link">Custom Theme (Link Color):</label>
+                    <input type="color" name="custom-link" id="custom-link">
                 </div>
             </div>
         </section>
@@ -172,9 +191,17 @@
             </div>
         </section>
 
-        <div class="file" data-window="about" name="file-about">
+        <div class="file" data-window="about" name="file-about" style="--i: 0">
             <div class="icon"></div>
             <p class="file-name">About This Project</p>
+        </div>
+        <div class="file" data-window="browser" name="file-browser" style="--i: 1">
+            <div class="icon"></div>
+            <p class="file-name">Browser</p>
+        </div>
+        <div class="file" data-window="notes" name="file-notes" style="--i: 2">
+            <div class="icon"></div>
+            <p class="file-name">Notes</p>
         </div>
     </main>
 
